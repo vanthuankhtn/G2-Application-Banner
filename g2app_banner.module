@@ -1,0 +1,101 @@
+<?php
+define('G2ITUNE_APP_URL', 'http://itunes.apple.com/lookup');
+define('G2IS_ANDROID', 'android');
+define('G2IS_IOS', 'ios');
+
+define('G2CACHE_ITUNE_APP_INFO', 'cache_itune_app');
+define('G2CACHE_GOOGLE_APP_INFO', 'cache_google_app');
+define('G2MAX_WORD', 4);
+define('G2CACHE_EXPIRED_TIME', 86400);
+
+define('G2APPLE_ID_DEFAULT', '576834756');
+define('G2GOOGLE_ID_DEFAULT', 'com.useradgents.mustela_android');
+
+/**
+ * Implement hook_menu
+ * @return mixed
+ */
+function g2app_banner_menu() {
+  $items['admin/config/g2app-banner'] = array(
+    'title' => t('G2 App Banner'),
+    'position' => 'right',
+    'weight' => 0,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('administer site configuration'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+
+  $items['admin/config/g2app-banner/settings'] = array(
+    'title' => t('Aplication configuration'),
+    'description' => t('Application configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('g2app_banner_setting_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'includes/g2app_banner.admin.inc',
+  );
+
+  $items['g2app-banner'] = array(
+    'description' => t('Get data from app banner'),
+    'page callback' => 'g2app_banner_information_get',
+    'access arguments' => array('access g2app banner'),
+    'file' => 'includes/g2app_banner.common.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ *
+ * @return array
+ */
+function g2app_banner_permission() {
+  return array(
+    'access g2app banner' => array(
+      'title' => t('Access g2app banner'),
+      'description' => t('Access feature for g2app banner.'),
+    ),
+  );
+}
+
+/**
+ * Implement hook_init
+ */
+function g2app_banner_init() {
+  if(!app_banner_device_get()) {
+    return;
+  }
+
+  $module_path = drupal_get_path('module', 'g2app_banner');
+  drupal_add_css($module_path . '/css/g2app_banner.css', array('group' => CSS_DEFAULT, 'every_page' => TRUE));
+
+  drupal_add_js($module_path . '/js/g2app_banner.js', array(
+    'scope' => 'footer',
+    'group' => JS_DEFAULT,
+    'every_page' => TRUE,
+    'weight' => -1,
+  ));
+}
+
+/**
+ * Get device request (just display on android and ios)
+ * @return bool|string
+ */
+function app_banner_device_get() {
+  $device_os = strtolower($_SERVER['HTTP_USER_AGENT']);
+  $iPod = strpos($device_os, "ipod");
+  $iPhone = strpos($device_os, "iphone");
+  $iPad = strpos($device_os, "ipad");
+
+  $android = strpos($device_os, "android");
+  $is_android_ios = $iPod || $iPhone || $iPad || $android ? true : false;
+
+  if(!strpos($device_os, 'mobile') && !$is_android_ios || strpos($device_os, 'windows') ) {
+    return false;
+  }
+
+  return ($android) ? G2IS_ANDROID : G2IS_IOS;
+}
+
+
