@@ -8,8 +8,8 @@ define('G2CACHE_GOOGLE_APP_INFO', 'cache_google_app');
 define('G2MAX_WORD', 4);
 define('G2CACHE_EXPIRED_TIME', 86400);
 
-define('G2APPLE_ID_DEFAULT', '576834756');
-define('G2GOOGLE_ID_DEFAULT', 'com.useradgents.mustela_android');
+define('G2APPLE_ID_DEFAULT', '68615807');
+define('G2GOOGLE_ID_DEFAULT', 'com.king.scrubbydubbysaga');
 
 /**
  * Implement hook_menu
